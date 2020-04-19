@@ -1,0 +1,27 @@
+name: lint_pr
+
+on: pull_request
+
+jobs:
+  reviewdog:
+    name: reviewdog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: omsmith/actions-reviewdog-xo@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+
+  xo:
+    name: xo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 13
+      - name: install dependencies
+        run: npm ci
+      - name: xo
+        run: npm run lint

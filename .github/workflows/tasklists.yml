@@ -1,0 +1,12 @@
+name: tasklists
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  tasklists:
+    name: run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: omsmith/actions-tasklists@latest

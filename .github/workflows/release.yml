@@ -1,0 +1,78 @@
+name: release
+
+on:
+  push:
+    tags:
+      - v*.*.*-src
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get tag details
+        id: tag_details
+        run: |
+          TAG_NAME="${GITHUB_REF:10}"
+          VERSION="${TAG_NAME::-4}"
+          MAJOR_VERSION="${VERSION%%.*}"
+
+          echo ::set-output name=NAME::${TAG_NAME}
+          echo ::set-output name=VERSION::${VERSION}
+          echo ::set-output name=MAJOR_VERSION::${MAJOR_VERSION}
+
+      - name: Verify tag signature
+        env:
+          TAG_NAME: ${{ steps.tag_details.outputs.NAME }}
+        run: |
+          curl https://github.com/omsmith.gpg | gpg --import
+          git fetch --depth=1 origin "+${GITHUB_REF}:${GITHUB_REF}"
+          git verify-tag "${TAG_NAME}"
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 13
+      - name: install dependencies
+        run: npm ci
+
+      - name: deploy
+        env:
+          BRANCH: latest
+          FOLDER: dist
+          TAG_NAME: ${{ steps.tag_details.outputs.NAME }}
+          VERSION: ${{ steps.tag_details.outputs.VERSION }}
+          MAJOR_VERSION: ${{ steps.tag_details.outputs.MAJOR_VERSION }}
+        run: |
+          git fetch --depth=1 origin "${BRANCH}"
+
+          if [ -d "${FOLDER}" ]; then
+            git worktree remove --force "${FOLDER}"
+          fi
+
+          git worktree add "${FOLDER}" "${BRANCH}"
+          rm -r "${FOLDER}"/* || :
+
+
+          MESSAGE=$(git tag -l "${TAG_NAME}" --format='%(subject)
+
+          %(body)' | sed -n '/-----BEGIN PGP SIGNATURE-----/q;p')
+
+          npm run build
+          cd "${FOLDER}"
+          npm ci --production
+          git add .
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git commit -m "${MESSAGE}"
+          git push origin "${BRANCH}"
+          git tag "${VERSION}" -m "${MESSAGE}"
+          git push origin "${VERSION}"
+          git tag -f "${MAJOR_VERSION}" -m "${MESSAGE}"
+          git push -f origin "${MAJOR_VERSION}"
+
+
+
+
