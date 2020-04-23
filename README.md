@@ -11,7 +11,6 @@ on:
 
 jobs:
   tasklists:
-    name: run
     runs-on: ubuntu-latest
     steps:
       - uses: omsmith/actions-tasklists@v1
