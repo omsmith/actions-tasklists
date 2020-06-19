@@ -15,10 +15,12 @@
   "scripts": {
     "build": "tsc --project src && cp action.yml LICENSE package*.json dist",
     "lint": "xo",
-    "lint:fix": "xo --fix"
+    "lint:fix": "xo --fix",
+    "test": "ts-node $(npm bin)/ava -v test/*"
   },
   "devDependencies": {
-    "@types/marked": "^0.7.4",
+    "ava": "^3.9.0",
+    "ts-node": "^8.10.2",
     "type-fest": "^0.15.1",
     "typescript": "^3.9.5",
     "xo": "^0.32.0"
