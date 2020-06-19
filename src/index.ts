@@ -2,9 +2,10 @@ import {promises as fs} from 'fs';
 const {readFile} = fs;
 
 import {getInput, info, setFailed} from '@actions/core';
-import {GitHub} from '@actions/github';
-
-import type {Octokit} from '@octokit/rest';
+import {getOctokit} from '@actions/github';
+import {
+	GetResponseTypeFromEndpointMethod as GetResponseType
+} from '@octokit/types';
 
 import {tasks, tokenize} from './tasklists';
 import {requireEnv} from './util';
@@ -30,7 +31,7 @@ async function main() {
 	const token = getInput('github_token', {required: true});
 	const reportTasks = getInput('report_tasks') === 'true';
 
-	const octokit = new GitHub(token);
+	const octokit = getOctokit(token);
 
 	const details = await getEventDetails();
 	if (!details) {
@@ -44,14 +45,12 @@ async function main() {
 		const existingStatuses = await octokit.repos.listStatusesForRef({repo, owner, ref: sha});
 		existingStatuses
 			.data
-			.map((item: Readonly<Pick<Octokit.ReposListStatusesForRefResponseItem, 'context'>>) =>
-				item.context
-			)
+			.map((item: { context: string }) => item.context)
 			.filter(name => name.startsWith('Tasklists Task:'))
 			.forEach(name => danglingTasksNames.add(name));
 	}
 
-	const statusP: Array<Promise<Octokit.Response<Octokit.ReposCreateStatusResponse>>> = [];
+	const statusP: Array<Promise<GetResponseType<typeof octokit.repos.createStatus>>> = [];
 
 	let completedCount = 0;
 	let totalCount = 0;
