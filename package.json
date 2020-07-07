@@ -19,7 +19,7 @@
     "test": "ts-node $(npm bin)/ava -v test/*"
   },
   "devDependencies": {
-    "ava": "^3.9.0",
+    "ava": "^3.10.1",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5",
     "xo": "^0.32.0"
