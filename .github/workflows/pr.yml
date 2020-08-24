@@ -1,4 +1,4 @@
-name: lint_pr
+name: pr
 
 on: pull_request
 
@@ -25,3 +25,16 @@ jobs:
         run: npm ci
       - name: xo
         run: npm run lint
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 13
+      - name: install dependencies
+        run: npm ci
+      - name: build
+        run: npm run build
