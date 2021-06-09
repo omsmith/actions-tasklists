@@ -1,5 +1,4 @@
 import {promises as fs} from 'fs';
-const {readFile} = fs;
 
 import {getInput, info, setFailed} from '@actions/core';
 import {getOctokit} from '@actions/github';
@@ -10,10 +9,12 @@ import {
 import {tasks, tokenize} from './tasklists';
 import {requireEnv} from './util';
 
+const {readFile} = fs;
+
 const GITHUB_EVENT_PATH = requireEnv('GITHUB_EVENT_PATH');
 
 async function getEventDetails() {
-	const event: WebhookPayload = JSON.parse(await readFile(GITHUB_EVENT_PATH, 'utf8'));
+	const event: WebhookPayload = JSON.parse(await readFile(GITHUB_EVENT_PATH, 'utf8')) as WebhookPayload;
 	if (!event.pull_request) {
 		info('Not a pull_request event. Skipping');
 		return;
@@ -43,11 +44,14 @@ async function main() {
 	const danglingTasksNames: Set<string> = new Set();
 	if (reportTasks) {
 		const existingStatuses = await octokit.repos.listCommitStatusesForRef({repo, owner, ref: sha});
-		existingStatuses
+		const danglingStatuses = existingStatuses
 			.data
-			.map((item: { context: string }) => item.context)
-			.filter(name => name.startsWith('Tasklists Task:'))
-			.forEach(name => danglingTasksNames.add(name));
+			.map((item: {context: string}) => item.context)
+			.filter(name => name.startsWith('Tasklists Task:'));
+
+		for (const danglingStatus of danglingStatuses) {
+			danglingTasksNames.add(danglingStatus);
+		}
 	}
 
 	const statusP: Array<Promise<GetResponseType<typeof octokit.repos.createCommitStatus>>> = [];
@@ -96,4 +100,6 @@ async function main() {
 	await Promise.all(statusP);
 }
 
-main().catch((error: Readonly<Error>) => setFailed(`Run failed: ${error.message}`));
+main().catch((error: Readonly<Error>) => {
+	setFailed(`Run failed: ${error.message}`);
+});

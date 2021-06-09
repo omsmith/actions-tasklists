@@ -1,11 +1,11 @@
 import {lexer, walkTokens} from 'marked';
 
-export function tokenize(string: string) {
+export function tokenize(string: string): marked.TokensList {
 	return lexer(string);
 }
 
-export function tasks(tokens: any[]) {
-	const tasks: Array<{ name: string; completed: boolean }> = [];
+export function tasks(tokens: marked.TokensList) {
+	const tasks: Array<{name: string; completed: boolean}> = [];
 
 	walkTokens(tokens, token => {
 		if (token.type !== 'list_item') {
@@ -16,7 +16,8 @@ export function tasks(tokens: any[]) {
 			return;
 		}
 
-		tasks.push({name: token.tokens[0].text, completed: token.checked});
+		const hack = (token as unknown) as {tokens: Array<{text: string}>};
+		tasks.push({name: hack.tokens[0].text, completed: token.checked});
 	});
 
 	return tasks;
