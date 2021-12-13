@@ -29,6 +29,6 @@
     "@actions/core": "^1.4.0",
     "@actions/github": "^4.0.0",
     "@octokit/types": "^6.16.4",
-    "marked": "^2.0.7"
+    "marked": "^4.0.7"
   }
 }
