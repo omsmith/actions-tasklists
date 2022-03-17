@@ -1,13 +1,13 @@
-import {lexer, walkTokens} from 'marked';
+import {marked} from 'marked';
 
 export function tokenize(string: string): marked.TokensList {
-	return lexer(string);
+	return marked.lexer(string);
 }
 
 export function tasks(tokens: marked.TokensList) {
 	const tasks: Array<{name: string; completed: boolean}> = [];
 
-	walkTokens(tokens, token => {
+	marked.walkTokens(tokens, token => {
 		if (token.type !== 'list_item') {
 			return;
 		}

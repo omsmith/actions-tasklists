@@ -3,7 +3,7 @@ import {promises as fs} from 'fs';
 import {getInput, info, setFailed} from '@actions/core';
 import {getOctokit} from '@actions/github';
 import {
-	GetResponseTypeFromEndpointMethod as GetResponseType
+	GetResponseTypeFromEndpointMethod as GetResponseType,
 } from '@octokit/types';
 
 import {tasks, tokenize} from './tasklists';
@@ -11,10 +11,10 @@ import {requireEnv} from './util';
 
 const {readFile} = fs;
 
-const GITHUB_EVENT_PATH = requireEnv('GITHUB_EVENT_PATH');
+const gitHubEventPath = requireEnv('GITHUB_EVENT_PATH');
 
 async function getEventDetails() {
-	const event: WebhookPayload = JSON.parse(await readFile(GITHUB_EVENT_PATH, 'utf8')) as WebhookPayload;
+	const event: WebhookPayload = JSON.parse(await readFile(gitHubEventPath, 'utf8')) as WebhookPayload;
 	if (!event.pull_request) {
 		info('Not a pull_request event. Skipping');
 		return;
@@ -43,7 +43,7 @@ async function main() {
 
 	const danglingTasksNames: Set<string> = new Set();
 	if (reportTasks) {
-		const existingStatuses = await octokit.repos.listCommitStatusesForRef({repo, owner, ref: sha});
+		const existingStatuses = await octokit.rest.repos.listCommitStatusesForRef({repo, owner, ref: sha});
 		const danglingStatuses = existingStatuses
 			.data
 			.map((item: {context: string}) => item.context)
@@ -54,7 +54,7 @@ async function main() {
 		}
 	}
 
-	const statusP: Array<Promise<GetResponseType<typeof octokit.repos.createCommitStatus>>> = [];
+	const statusP: Array<Promise<GetResponseType<typeof octokit.rest.repos.createCommitStatus>>> = [];
 
 	let completedCount = 0;
 	let totalCount = 0;
@@ -67,34 +67,34 @@ async function main() {
 		if (reportTasks) {
 			const name = `Tasklists Task: ${task.name}`;
 			danglingTasksNames.delete(name);
-			statusP.push(octokit.repos.createCommitStatus({
+			statusP.push(octokit.rest.repos.createCommitStatus({
 				repo, owner, sha,
 
 				context: name,
-				state: task.completed ? 'success' : 'pending'
+				state: task.completed ? 'success' : 'pending',
 			}));
 		}
 	}
 
 	for (const name of danglingTasksNames.values()) {
-		statusP.push(octokit.repos.createCommitStatus({
+		statusP.push(octokit.rest.repos.createCommitStatus({
 			repo, owner, sha,
 
 			context: name,
 			description: 'Removed',
-			state: 'error'
+			state: 'error',
 		}));
 	}
 
 	const completed = completedCount === totalCount;
-	statusP.push(octokit.repos.createCommitStatus({
+	statusP.push(octokit.rest.repos.createCommitStatus({
 		repo, owner, sha,
 
 		context: 'Tasklists: Completed',
-		description: totalCount === 0 ?
-			'No tasks' :
-			`${completedCount} of ${totalCount} tasks`,
-		state: completed ? 'success' : 'pending'
+		description: totalCount === 0
+			? 'No tasks'
+			: `${completedCount} of ${totalCount} tasks`,
+		state: completed ? 'success' : 'pending',
 	}));
 
 	await Promise.all(statusP);

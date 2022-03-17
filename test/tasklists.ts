@@ -1,8 +1,6 @@
-'use strict';
+import test from 'ava';
 
-const test = require('ava');
-
-const {tokenize, tasks: taskify} = require('../src/tasklists.ts');
+import {tokenize, tasks as taskify} from '../src/tasklists';
 
 test('no tasks', t => {
 	const tasks = taskify(tokenize(`
@@ -23,7 +21,7 @@ The quick brown fox jumps over the lazy dog
 `));
 
 	t.deepEqual(tasks, [{
-		name: 'Paint the fox brown', completed: false
+		name: 'Paint the fox brown', completed: false,
 	}]);
 });
 
@@ -37,13 +35,13 @@ The quick brown fox jumps over the lazy dog
 `));
 
 	t.deepEqual(tasks, [{
-		name: 'Paint the fox brown', completed: false
+		name: 'Paint the fox brown', completed: false,
 	}, {
-		name: 'Get a brush', completed: false
+		name: 'Get a brush', completed: false,
 	}, {
-		name: 'Get brown paint', completed: false
+		name: 'Get brown paint', completed: false,
 	}, {
-		name: 'Combine', completed: false
+		name: 'Combine', completed: false,
 	}]);
 });
 
@@ -57,13 +55,13 @@ The quick brown fox jumps over the lazy dog
 `));
 
 	t.deepEqual(tasks, [{
-		name: 'Paint the fox brown', completed: false
+		name: 'Paint the fox brown', completed: false,
 	}, {
-		name: 'Get a brush', completed: false
+		name: 'Get a brush', completed: false,
 	}, {
-		name: 'Get brown paint', completed: false
+		name: 'Get brown paint', completed: false,
 	}, {
-		name: 'Combine', completed: false
+		name: 'Combine', completed: false,
 	}]);
 });
 
@@ -84,21 +82,21 @@ The quick brown fox jumps over the lazy dog
 `));
 
 	t.deepEqual(tasks, [{
-		name: 'Paint the fox brown', completed: false
+		name: 'Paint the fox brown', completed: false,
 	}, {
-		name: 'Get a brush', completed: false
+		name: 'Get a brush', completed: false,
 	}, {
-		name: 'Get brown paint', completed: false
+		name: 'Get brown paint', completed: false,
 	}, {
-		name: 'Combine', completed: false
+		name: 'Combine', completed: false,
 	}, {
-		name: 'Paint the fox brown', completed: false
+		name: 'Paint the fox brown', completed: false,
 	}, {
-		name: 'Get a brush', completed: false
+		name: 'Get a brush', completed: false,
 	}, {
-		name: 'Get brown paint', completed: false
+		name: 'Get brown paint', completed: false,
 	}, {
-		name: 'Combine', completed: false
+		name: 'Combine', completed: false,
 	}]);
 });
 
@@ -109,7 +107,7 @@ The quick brown fox jumps over the lazy dog
 `));
 
 	t.deepEqual(tasks, [{
-		name: 'Paint the fox brown', completed: true
+		name: 'Paint the fox brown', completed: true,
 	}]);
 });
 

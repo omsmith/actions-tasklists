@@ -13,10 +13,10 @@
   },
   "homepage": "https://github.com/omsmith/actions-tasklists#readme",
   "scripts": {
-    "build": "tsc --project src && cp action.yml LICENSE package*.json dist",
+    "build": "tsc && cp action.yml LICENSE package*.json dist",
     "lint": "xo",
     "lint:fix": "xo --fix",
-    "test": "ts-node $(npm bin)/ava -v test/*"
+    "test": "ava -v test/*"
   },
   "devDependencies": {
     "@types/marked": "^4.0.2",
@@ -30,5 +30,13 @@
     "@actions/github": "^5.0.0",
     "@octokit/types": "^6.34.0",
     "marked": "^4.0.12"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
   }
 }

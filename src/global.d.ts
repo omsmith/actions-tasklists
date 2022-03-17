@@ -1,4 +1,4 @@
-export const __PLACEHODLER = 'hacks';
+export const placeholder = 'hacks';
 
 declare global {
 	namespace marked {
