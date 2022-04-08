@@ -1,6 +1,6 @@
 # Tasklists
 
-This action turns the taskslist in a Pull Request into actionable PR statuses.
+This action turns the taskslist in a Pull Request into actionable PR statuses.f
 
 ## Usage
 
