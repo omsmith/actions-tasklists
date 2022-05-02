@@ -26,7 +26,7 @@
     "xo": "^0.48.0"
   },
   "dependencies": {
-    "@actions/core": "^1.6.0",
+    "@actions/core": "^1.7.0",
     "@actions/github": "^5.0.0",
     "@octokit/types": "^6.34.0",
     "marked": "^4.0.12"
